@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {createTask, getTasks, deleteTask, type Task} from './api'
+import {createTask, getTasks, deleteTask, type Task, updateTask} from './api'
 
 function App() {
     const [tasks, setTasks] = useState<Task[]>([])
@@ -8,6 +8,22 @@ function App() {
     const [newTaskTitle, setNewTaskTitle] = useState("")
     const [newTaskDescription, setNewTaskDescription] = useState("")
     const [newTaskStatus, setNewTaskStatus] = useState("To Do")
+
+    const handleMoveTask = async (taskId: number, newStatus: string) => {
+        try {
+            await updateTask(taskId, {status: newStatus})
+
+            setTasks(tasks.map((t) => {
+                if (t.id === taskId) {
+                    return {...t, status: newStatus}
+                } else {
+                    return t
+                }
+            }))
+        } catch (error) {
+            console.log("Error updating task: ", error)
+        }
+    }
 
     const handleCreateTask = async () => {
         if (!newTaskTitle) return;
@@ -109,6 +125,13 @@ function App() {
                                         <button className={"text-sm text-red-600 font-bold mt-2 hover:underline"}
                                                 onClick={() => handleDeleteTask(task.id)}>Delete
                                         </button>
+                                        <div className="flex justify-end mt-2">
+                                            <button
+                                                className="text-sm text-blue-500 hover:text-blue-700 font-bold"
+                                                onClick={() => handleMoveTask(task.id, "In Progress")}>
+                                                In Progress →
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                         </div>
@@ -127,6 +150,19 @@ function App() {
                                         <button className={"text-sm text-red-600 font-bold mt-2 hover:underline"}
                                                 onClick={() => handleDeleteTask(task.id)}>Delete
                                         </button>
+                                        <div className="flex justify-between mt-2">
+                                            <button
+                                                className="text-sm text-gray-500 hover:text-black font-bold"
+                                                onClick={() => handleMoveTask(task.id, "To Do")}
+                                            >
+                                                ← Back
+                                            </button>
+                                            <button
+                                                className="text-sm text-green-600 hover:underline font-bold"
+                                                onClick={() => handleMoveTask(task.id, "Done")}>
+                                                Finish →
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                         </div>
@@ -139,12 +175,22 @@ function App() {
                             {tasks
                                 .filter((task) => task.status === "Done")
                                 .map((task) => (
-                                    <div key={task.id} className={"bg-white p-4 rounded shadow border border-green-100"}>
-                                        <strong className={"block text-lg text-gray-800 line-through decoration-gray-400"}>{task.title}</strong>
+                                    <div key={task.id}
+                                         className={"bg-white p-4 rounded shadow border border-green-100"}>
+                                        <strong
+                                            className={"block text-lg text-gray-800 line-through decoration-gray-400"}>{task.title}</strong>
                                         <p className={"text-sm text-gray-500"}>{task.description}</p>
                                         <button className={"text-sm text-red-600 font-bold mt-2 hover:underline"}
                                                 onClick={() => handleDeleteTask(task.id)}>Delete
                                         </button>
+                                        <div className="flex justify-between mt-2">
+                                            <button
+                                                className="text-sm text-blue-500 hover:text-blue-700 font-bold"
+                                                onClick={() => handleMoveTask(task.id, "In Progress")}
+                                            >
+                                                ← Back
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                         </div>

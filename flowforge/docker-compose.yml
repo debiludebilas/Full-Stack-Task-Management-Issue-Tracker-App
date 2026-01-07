@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  # Python Backend
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"  # Maps localhost:8000 to container:8000
+    volumes:
+      - ./backend/flowforge.db:/app/flowforge.db # Persist the database file so data isn't lost on restart
+
+  # React Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"    # Maps localhost:5173 to container:80 (Nginx)
+    depends_on:
+      - backend
